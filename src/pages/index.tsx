@@ -2,82 +2,114 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import {Layout} from "@/layout";
-import { ColorType, createChart } from 'lightweight-charts';
-import { useEffect, useRef } from 'react';
+import {useChainId} from "wagmi";
+import {defaultChain} from "@/application/provider/web3/wagmi";
+import {useMemo} from "react";
+import { Box, VStack, Card, CardHeader, CardBody, CardFooter, Image } from '@chakra-ui/react'
+import { Link } from '@chakra-ui/next-js'
 
-export const ChartComponent = (props:any) => {
-    const {
-        data,
-        colors: {
-            backgroundColor = 'black',
-            lineColor = '#2962FF',
-            textColor = 'white',
-            areaTopColor = '#2962FF',
-            areaBottomColor = 'rgba(41, 98, 255, 0.28)',
-        } = {},
-    } = props;
-
-    const chartContainerRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(
-
-        () => {
-        // if(chartContainerRef?.current === null) return
-
-            const handleResize = () => {
-
-              chart.applyOptions({ width: chartContainerRef.current?.clientWidth });
-            };
-            
-
-          const chart = createChart(chartContainerRef.current!, {
-              layout: {
-                background: { type: ColorType.Solid, color: backgroundColor },
-                textColor,
-              },
-
-              width: chartContainerRef.current?.clientWidth,
-              height: 300,
-            });
-            chart.timeScale().fitContent();
-            
-            const newSeries = chart.addAreaSeries({ lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
-            newSeries.setData(data);
-            
-            window.addEventListener('resize', handleResize);
-          
-
-            return () => {
-                window.removeEventListener('resize', handleResize);
-
-                chart.remove();
-            };
-        },
-        [data, backgroundColor, lineColor, textColor, areaTopColor, areaBottomColor]
-    );
-
-  return (
-        <div style={{width: "100%"}}
-            ref={chartContainerRef}
-        />
-    );
-};
-
-const initialData = [
-    { time: '2018-12-22', value: 32.51 },
-    { time: '2018-12-23', value: 31.11 },
-    { time: '2018-12-24', value: 27.02 },
-    { time: '2018-12-25', value: 27.32 },
-    { time: '2018-12-26', value: 25.17 },
-    { time: '2018-12-27', value: 28.89 },
-    { time: '2018-12-28', value: 25.46 },
-    { time: '2018-12-29', value: 23.92 },
-    { time: '2018-12-30', value: 22.68 },
-    { time: '2018-12-31', value: 22.67 },
-];
+const tokens = [
+    {
+        "name": "Wrapped BNB",
+        "symbol": "WBNB",
+        "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+        "chainId": 97,
+        "decimals": 18,
+        "logoURI": "https://pancake.kiemtienonline360.com/images/coins/0xae13d989dac2f0debff460ac112a837c89baa7cd.png"
+    },
+    {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "address": "0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684",
+        "chainId": 97,
+        "decimals": 18,
+        "logoURI": "https://pancake.kiemtienonline360.com/images/coins/0x7ef95a0fee0dd31b22626fa2e10ee6a223f8a684.png"
+    },
+    {
+        "name": "Ethereum Token",
+        "symbol": "ETH",
+        "address": "0x8BaBbB98678facC7342735486C851ABD7A0d17Ca",
+        "chainId": 97,
+        "decimals": 18,
+        "logoURI": "https://pancake.kiemtienonline360.com/images/coins/0x8babbb98678facc7342735486c851abd7a0d17ca.png"
+    },
+    {
+        "name": "BUSD Token",
+        "symbol": "BUSD",
+        "address": "0x78867BbEeF44f2326bF8DDd1941a4439382EF2A7",
+        "chainId": 97,
+        "decimals": 18,
+        "logoURI": "https://pancake.kiemtienonline360.com/images/coins/0x78867bbeef44f2326bf8ddd1941a4439382ef2a7.png"
+    },
+    {
+        "name": "Dai Token",
+        "symbol": "DAI",
+        "address": "0x8a9424745056Eb399FD19a0EC26A14316684e274",
+        "chainId": 97,
+        "decimals": 18,
+        "logoURI": "https://pancake.kiemtienonline360.com/images//coins/0x8a9424745056eb399fd19a0ec26a14316684e274.png"
+    },
+    {
+        "name": "PancakeSwap Token",
+        "symbol": "CAKE",
+        "address": "0xF9f93cF501BFaDB6494589Cb4b4C15dE49E85D0e",
+        "chainId": 97,
+        "decimals": 18,
+        "logoURI": "https://pancake.kiemtienonline360.com/images/coins/0xf9f93cf501bfadb6494589cb4b4c15de49e85d0e.png"
+    },
+    {
+        "name": "SafeMoon",
+        "symbol": "SAFEMOON",
+        "address": "0xdacbdecc2992a63390d108e8507b98c7e2b5584a",
+        "chainId": 97,
+        "decimals": 9,
+        "logoURI": "https://pancake.kiemtienonline360.com/images/coins/0xdacbdecc2992a63390d108e8507b98c7e2b5584a.png"
+    },
+    {
+        "name": "Wrapped BNB",
+        "symbol": "WBNB",
+        "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+        "chainId": 56,
+        "decimals": 18,
+        "logoURI": "https://pancakeswap.finance/images/tokens/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c.png"
+    },
+    {
+        "name": "BUSD Token",
+        "symbol": "BUSD",
+        "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+        "chainId": 56,
+        "decimals": 18,
+        "logoURI": "https://pancakeswap.finance/images/tokens/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56.png"
+    },
+    {
+        "name": "Ethereum Token",
+        "symbol": "ETH",
+        "address": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+        "chainId": 56,
+        "decimals": 18,
+        "logoURI": "https://pancakeswap.finance/images/tokens/0x2170Ed0880ac9A755fd29B2688956BD959F933F8.png"
+    },
+    {
+        "name": "BTCB Token",
+        "symbol": "BTCB",
+        "address": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+        "chainId": 56,
+        "decimals": 18,
+        "logoURI": "https://pancakeswap.finance/images/tokens/0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c.png"
+    },
+    {
+        "name": "Tether USD",
+        "symbol": "USDT",
+        "address": "0x55d398326f99059fF775485246999027B3197955",
+        "chainId": 56,
+        "decimals": 18,
+        "logoURI": "https://pancakeswap.finance/images/tokens/0x55d398326f99059fF775485246999027B3197955.png"
+    },
+]
 
 const Home: NextPage = () => {
-
+    const connectedChainId = useChainId()
+    const chainId = useMemo(() => connectedChainId || defaultChain.id, [connectedChainId])
 
   return (
     <Layout>
@@ -97,19 +129,22 @@ const Home: NextPage = () => {
           <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <ChartComponent data={initialData}/>
+          <Box>
+              <VStack spacing={"24px"}>
+                  {tokens.filter(token => token.chainId == chainId).map(token => (
+                      <Link href={`/token/${token.address}`}>
+                        <Card key={token.address}>
+                            <CardHeader>{token.name}</CardHeader>
+                            <CardBody>
+                                <Image src={token.logoURI} />
+                            </CardBody>
+                            <CardFooter>{token.address}</CardFooter>
+                        </Card>
+                      </Link>
+                  ))}
+              </VStack>
+          </Box>
       </main>
-
-      <footer className={styles.footer}>
-        <a href="https://rainbow.me" rel="noopener noreferrer" target="_blank">
-          Made with ❤️ by your frens at 🌈
-        </a>
-      </footer>
     </div>
     </Layout>
   );
