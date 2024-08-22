@@ -6,9 +6,9 @@ import { useMemo } from "react"
 import { useChainId, useReadContract } from "wagmi"
 
 import { defaultChain } from "@/application/provider/web3/wagmi"
-import { Layout } from "@/layout"
 import ERC20__Abi from "@/shared/abi/ERC20"
 import { ChartComponent } from "@/shared/components/Chart"
+import { BaseLayout } from "@/shared/layout/Base.layout"
 
 const initialData = [
   { time: "2018-12-22", value: 32.51 },
@@ -42,32 +42,28 @@ const TokenPage: NextPage = () => {
   })
 
   return (
-    <Layout>
-      <div>
-        <Head>
-          <title>DEXE | {result?.data ?? "Token"}</title>
-          <meta content="About page" name="description" />
-          <link href="/favicon.ico" rel="icon" />
-        </Head>
+    <BaseLayout>
+      <Head>
+        <title>DEXE | {result?.data ?? "Token"}</title>
+        <meta content="About page" name="description" />
+        <link href="/favicon.ico" rel="icon" />
+      </Head>
 
-        <main>
-          <h1>
-            Token name from contract:{" "}
-            {result.isFetching ? (
-              <SkeletonText />
-            ) : (
-              <>
-                <Text color={result?.error ? "tomato" : "green"}>
-                  {result?.data ?? "Failed to fetch"}
-                </Text>
-                <Text>adsfasdfasdfa</Text>
-              </>
-            )}
-          </h1>
-          <ChartComponent data={initialData} />
-        </main>
-      </div>
-    </Layout>
+      <h1>
+        Token name from contract:{" "}
+        {result.isFetching ? (
+          <SkeletonText />
+        ) : (
+          <>
+            <Text color={result?.error ? "tomato" : "green"}>
+              {result?.data ?? "Failed to fetch"}
+            </Text>
+            <Text>adsfasdfasdfa</Text>
+          </>
+        )}
+      </h1>
+      <ChartComponent data={initialData} />
+    </BaseLayout>
   )
 }
 
