@@ -1,5 +1,15 @@
 import { Link } from "@chakra-ui/next-js"
-import { Box, Card, CardBody, CardFooter, CardHeader, Image, VStack } from "@chakra-ui/react"
+import {
+  Box,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Image,
+  Skeleton,
+  VStack,
+} from "@chakra-ui/react"
+import { useQuery } from "@tanstack/react-query"
 import type { NextPage } from "next"
 import Head from "next/head"
 
@@ -120,6 +130,11 @@ const tokens = [
 const Home: NextPage = () => {
   const chainId = useLastChainId()
 
+  const { isPending, error, data } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: () => tokens,
+  })
+
   return (
     <BaseLayout>
       <Head>
@@ -135,19 +150,29 @@ const Home: NextPage = () => {
 
       <Box>
         <VStack spacing={"24px"}>
-          {tokens
-            .filter(token => token.chainId == chainId)
-            .map(token => (
-              <Link href={`/token/${token.address}`} key={token.address}>
-                <Card>
-                  <CardHeader>{token.name}</CardHeader>
-                  <CardBody>
-                    <Image src={token.logoURI} />
-                  </CardBody>
-                  <CardFooter>{token.address}</CardFooter>
-                </Card>
-              </Link>
-            ))}
+          {isPending ? (
+            <>
+              <Skeleton />
+              <Skeleton />
+              <Skeleton />
+            </>
+          ) : !!data && data?.length > 0 ? (
+            data
+              .filter(token => token.chainId == chainId)
+              .map(token => (
+                <Link href={`/token/${token.address}`} key={token.address}>
+                  <Card>
+                    <CardHeader>{token.name}</CardHeader>
+                    <CardBody>
+                      <Image src={token.logoURI} />
+                    </CardBody>
+                    <CardFooter>{token.address}</CardFooter>
+                  </Card>
+                </Link>
+              ))
+          ) : (
+            <></>
+          )}
         </VStack>
       </Box>
     </BaseLayout>
