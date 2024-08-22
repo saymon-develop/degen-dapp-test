@@ -8,7 +8,7 @@ import type { AppProps } from "next/app"
 import { WagmiProvider } from "wagmi"
 
 import { chakraTheme } from "@/application/provider/theme/chakra"
-import { config } from "@/application/provider/web3/wagmi"
+import { config } from "@/application/web3/wagmi"
 
 const client = new QueryClient()
 

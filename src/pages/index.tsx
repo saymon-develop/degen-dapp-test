@@ -2,10 +2,8 @@ import { Link } from "@chakra-ui/next-js"
 import { Box, Card, CardBody, CardFooter, CardHeader, Image, VStack } from "@chakra-ui/react"
 import type { NextPage } from "next"
 import Head from "next/head"
-import { useMemo } from "react"
-import { useChainId } from "wagmi"
 
-import { defaultChain } from "@/application/provider/web3/wagmi"
+import { useLastChainId } from "@/application/web3"
 import { BaseLayout } from "@/shared/layout/Base.layout"
 
 const tokens = [
@@ -120,8 +118,7 @@ const tokens = [
 ]
 
 const Home: NextPage = () => {
-  const connectedChainId = useChainId()
-  const chainId = useMemo(() => connectedChainId || defaultChain.id, [connectedChainId])
+  const chainId = useLastChainId()
 
   return (
     <BaseLayout>
@@ -141,8 +138,8 @@ const Home: NextPage = () => {
           {tokens
             .filter(token => token.chainId == chainId)
             .map(token => (
-              <Link href={`/token/${token.address}`}>
-                <Card key={token.address}>
+              <Link href={`/token/${token.address}`} key={token.address}>
+                <Card>
                   <CardHeader>{token.name}</CardHeader>
                   <CardBody>
                     <Image src={token.logoURI} />

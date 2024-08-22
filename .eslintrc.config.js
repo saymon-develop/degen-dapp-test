@@ -1,5 +1,8 @@
 const typeScriptEsLintPlugin = require("@typescript-eslint/eslint-plugin")
 const esLintConfigPrettier = require("eslint-config-prettier")
+const reactPlugin = require("eslint-plugin-react")
+const reactHooksPlugin = require("eslint-plugin-react-hooks")
+const { fixupPluginRules } = require("@eslint/compat")
 const { FlatCompat } = require("@eslint/eslintrc")
 
 // Translate ESLintRC-style configs into flat configs.
@@ -12,21 +15,14 @@ module.exports = [
   // ESLint recommended flat config.
   // Flat config for parsing TypeScript files. Includes rules for TypeScript.
   ...compat.config({
-    env: { node: true },
-    extends: ["plugin:@typescript-eslint/recommended", "prettier"],
+    env: { node: true, browser: true },
+    extends: ["plugin:@typescript-eslint/recommended", "plugin:react/recommended", "prettier"],
     parser: "@typescript-eslint/parser",
     parserOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
     },
-    plugins: [
-      "prettier",
-      "@typescript-eslint",
-      "jsx-a11y",
-      "promise",
-      "simple-import-sort",
-      "react-hooks",
-    ],
+    plugins: ["prettier", "@typescript-eslint", "jsx-a11y", "promise", "simple-import-sort"],
     rules: {
       "prettier/prettier": [
         "warn",
@@ -140,6 +136,16 @@ module.exports = [
 
   // Flat config for ESLint rules.
   {
-    rules: {},
+    plugins: {
+      react: reactPlugin,
+      "react-hooks": fixupPluginRules(reactHooksPlugin),
+    },
+    rules: {
+      "react/react-in-jsx-scope": "off",
+      "react/jsx-filename-extension": [1, { extensions: [".ts", ".tsx"] }],
+
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+    },
   },
 ]

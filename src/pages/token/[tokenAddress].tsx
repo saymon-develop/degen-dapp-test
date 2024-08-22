@@ -2,10 +2,9 @@ import { SkeletonText, Text } from "@chakra-ui/react"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import { useMemo } from "react"
-import { useChainId, useReadContract } from "wagmi"
+import { useReadContract } from "wagmi"
 
-import { defaultChain } from "@/application/provider/web3/wagmi"
+import { useLastChainId } from "@/application/web3"
 import ERC20__Abi from "@/shared/abi/ERC20"
 import { ChartComponent } from "@/shared/components/Chart"
 import { BaseLayout } from "@/shared/layout/Base.layout"
@@ -27,14 +26,13 @@ const TokenPage: NextPage = () => {
   const router = useRouter()
   const { tokenAddress } = router.query
 
-  const connectedChainId = useChainId()
-  const chainId = useMemo(() => connectedChainId || defaultChain.id, [connectedChainId])
+  const currentChain = useLastChainId()
 
   const result = useReadContract({
     abi: ERC20__Abi,
     address: tokenAddress as `0x${string}`,
     functionName: "name",
-    chainId: chainId,
+    chainId: currentChain,
     query: {
       enabled: !!tokenAddress,
       refetchOnWindowFocus: false,

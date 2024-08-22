@@ -1,8 +1,6 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { bsc, bscTestnet } from "wagmi/chains"
 
-export const defaultChain = bscTestnet
-
 export const config = getDefaultConfig({
   appName: "RainbowKit App",
   projectId: "YOUR_PROJECT_ID",
